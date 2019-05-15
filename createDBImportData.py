@@ -2,6 +2,7 @@ import pymongo, sys, re
 from pymongo import MongoClient
 import datetime, random
 from insertSomeData import take_input
+from bson.objectid import ObjectId
 
 client = MongoClient('mongodb://localhost', 27017)
 
@@ -33,6 +34,12 @@ class shortenSaveUrl:
 
     @classmethod
     def shorten_url(cls, url):
+        """
+        this core logic to shorten the URL.
+        :param url: the original URL sent by the
+                    user from the frontend.
+        :return: the shorten url
+        """
         jumbled = url[len('https://'):]
 
         rng = random.sample(range(1, len(jumbled)), len(jumbled) // 4)
@@ -56,6 +63,12 @@ class shortenSaveUrl:
         yield newurl
 
     def read_urls_from_file(self, filename):
+        """
+        this method is used to read the bunch of URLs
+        from a text file and insert them into the DB.
+        :param filename: the name of the input file
+        :return: the of all the URLs read from the file
+        """
         with open(filename, 'r') as top:
             self.urlsList = top.readlines()
         return self.urlsList
@@ -101,24 +114,65 @@ class shortenSaveUrl:
 
     @staticmethod
     def insert_many_urls(many_urls):
-        urlCollection.insert_many(many_urls)
+        """
+        this method is use to issue the Pymongo command
+        to insert the data.
+        :param many_urls: the list of URLs
+        :return: the ids of all the URLs inserted in the
+                 DB
+        """
+        ids = urlCollection.insert_many(many_urls)
+        return ids
 
     @staticmethod
     def insert_one_url(url_to_insert):
-        urlCollection.insert_one(url_to_insert)
+        """
+        this method is use to insert one URL at a time
+        into the DB
+        :param url_to_insert: the original URL to insert
+                              into the DB
+        :return: the id of the inserted URL.
+        """
+        ids = urlCollection.insert_one(url_to_insert)
+        print(ids.inserted_id)
+        return ids
 
     @staticmethod
     def find_by_part_name(searchparam):
+        """
+        this method is used to find the entry in the DB
+        by using a keyword given by the user. This method
+        at present can be used from the CLI.
+        :param searchparam:
+        :return: the shorten URL to send to the front end
+        """
+        item = dict()
+        urlCollection.create_index([('name', pymongo.TEXT),('org_url', pymongo.TEXT)])
         found_docs = list(urlCollection.find({'$text': {'$search': searchparam}}))
         print("Found %d docs matching the querry" %len(found_docs))
         for item in found_docs:
             print("URL: ", item['org_url'])
+        return item['short_url']
 
     @staticmethod
-    def creating_index():
-        urlCollection.create_index([('org_url', pymongo.TEXT)], unique=True)
+    def find_by_id(docid):
+        """
+        this method is used to find the document in the
+        collection of the DB
+        :param docid: the id of the document to find
+        :return: the shorten URL to be shown on the
+                front end.
+        """
+        item = urlCollection.find_one({"_id": ObjectId(docid)})
+        return item['short_url']
+
 
 def add_url():
+    """
+    the wrapper method that calls the instance method
+    that prepares the input to be fed to the DB
+    :return: None
+    """
     workWithUrls = shortenSaveUrl()
     # Paste or type the URL(s) to insert into the DB
     print("Paste/Type the url to enter")
@@ -128,20 +182,49 @@ def add_url():
     list_urls = workWithUrls.prepare_doc_to_insert([user_input])
 
     # Insert a single url into the DB
-    workWithUrls.insert_one_url(list_urls[0])
+    shortenSaveUrl.insert_one_url(list_urls[0])
 
 
 def search_by_name():
+    """
+    this method is a wrapper method to the static
+    method of the class.
+    :return: None
+    """
     print("\tEnter the keyword for the url")
     search_name = str(input()).lower()
     search = shortenSaveUrl()
     search.find_by_part_name(search_name)
 
 
+def delete_doc():
+    """
+    this is a wrapper method to delete the
+    document from the DB
+    :return: None
+    """
+    print("Following fields are present in the collection")
+    print("Fields: [name, org_url, org_len, short_len, short_url, when]\n")
+    print("{filed_name+val}")
+    user_input = str(input())
+    a, b = user_input.split(" ")
+    # user_input = "\"" +a + "\"" + ":"+ "\""+b+"\""
+    doc = dict()
+    doc[a] = b
+    urlCollection.delete_one(user_input)
+
+
 def what_next():
+    """
+    this method is used to interact with the
+    user through Command Line Interface.
+    :return: None
+    """
     print("What you want to do ?")
     print("\tAdd new url to DB or Search a url in the DB")
-    print("\tType \"add\" or \"search\" ")
+    print("\t\tType \"add\" or \"search\" ")
+    print("\tDelete a document")
+    print("\t\tType \"del\" or \"delete\"")
     print("\tType quit/Quit/q to quit")
     user_input = str(input())
 
@@ -149,6 +232,8 @@ def what_next():
         add_url()
     elif user_input.lower() == "search":
         search_by_name()
+    elif user_input.lower() in ["delete", "del"]:
+        delete_doc()
     elif user_input.lower() == "q" or user_input == "quit":
         sys.exit(1)
     else:
@@ -159,7 +244,3 @@ if __name__ == "__main__":
         take_input('top100.txt')
     while True:
         what_next()
-
-# take filename as input to insert bulk
-# take one or more url separated by comma
-# avoid duplicates SOLU: Creates a unique index to avoid adding duplicates

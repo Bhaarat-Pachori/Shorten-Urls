@@ -1,0 +1,46 @@
+<!doctype html>
+<html lang="en" xmlns="http://www.w3.org/1999/html" xmlns="http://www.w3.org/1999/html">
+  <script>
+  </script>
+  <head>
+      <meta charset="utf-8">
+      <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=yes">
+      <link rel="stylesheet" href="bootstrap/css/bootstrap.min.css">
+      <meta name="viewport" content="width=device-width, initial-scale=1">
+      <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.4.0/css/bootstrap.min.css">
+      <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.3.1/jquery.min.js"></script>
+      <!--script-- src="/Users/bhaarat/Downloads/Shorten-Urls/bootstrap/js/bootstrap.min.js"></script-->
+      <script src="https://stackpath.bootstrapcdn.com/bootstrap/4.3.1/js/bootstrap.min.js" integrity="sha384-JjSmVgyd0p3pXB1rRibZUAYoIIy6OrQ6VrjIEaFf/nJGzIxFDsf4x0xIM+B07jRM" crossorigin="anonymous"></script>
+    <title>Shorten URLs</title>
+  </head>
+  <body>
+    <div class="container">
+        <h1 class="page-header">Get short URLs</h1>
+        <p class="lead"><small>Paste your long urls and enjoy the <mark>shorter version of it.</mark></small></p>
+    </div>
+    <!-- Optional JavaScript -->
+    <!-- jQuery first, then Popper.js, then Bootstrap JS -->
+    <!--script src="https://code.jquery.com/jquery-3.3.1.slim.min.js" integrity="sha384-q8i/X+965DzO0rT7abK41JStQIAqVgRVzpbzo5smXKp4YfRvH+8abtTE1Pi6jizo" crossorigin="anonymous"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/popper.js/1.14.7/umd/popper.min.js" integrity="sha384-UO2eT0CpHqdSJQ6hJty5KVphtPhzWj9WO1clHTMGa3JDZwrnQq4sF86dIHNDz0W1" crossorigin="anonymous"></script>
+    <script src="https://stackpath.bootstrapcdn.com/bootstrap/4.3.1/js/bootstrap.min.js" integrity="sha384-JjSmVgyd0p3pXB1rRibZUAYoIIy6OrQ6VrjIEaFf/nJGzIxFDsf4x0xIM+B07jRM" crossorigin="anonymous"></script-->
+    <form action="http://localhost:6789/short" method="post" class="form-inline justify-content-center">
+            <div class="input-group d-flex justify-content-center align-items-center container">
+                <input name="org_url" type="text" class="form-control">
+                <span class="input-group-btn">
+                <button class="btn btn-primary" type="submit">Shorten</button>
+                </span>
+            </div>
+            <div id="resultdiv" class="alert alert-success alert-dismissible col-md-4 col-md-offset-4" align="center">
+                <a href="#" class="close" data-dismiss="alert" aria-label="close">&times;</a>
+                <strong>{{ status }}<br></strong>
+                  <div id="show" align="center">
+                <script>
+                    function gorVal(){
+                    document.getElementById("resultdiv").style.display="block";
+                    alert(data);
+                }
+                </script>
+            </div>
+     </form>
+  </body>
+</html>

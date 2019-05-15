@@ -9,8 +9,8 @@ def take_input(filename):
     # Make a a list of dictionaries from the inputs
     formattedUrls = workwithurl.prepare_doc_to_insert(listurls)
 
-    shortenSaveUrl.creating_index()
     # Insert the data into the database
     shortenSaveUrl.insert_many_urls(formattedUrls)
 
     shortenSaveUrl.imported = True
+
